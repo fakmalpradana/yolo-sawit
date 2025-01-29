@@ -1,3 +1,10 @@
+import os
+
+# Disable OpenMP threading to avoid duplicate initialization
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
+
 from ultralytics import YOLO
 from roboflow import Roboflow
 
@@ -15,9 +22,10 @@ sp.call(
         "yolo", 
         "task=segment",
         "mode=train", 
-        "model=yolo11s-seg.pt",
-        "data={dataset.location}/data.yaml", 
+        "model=yolo11x-seg.pt",
+        f"data={dataset.location}/data.yaml", 
         "epochs=10", 
-        "imgsz=640"
+        "imgsz=320",
+        "scale=1.0"
     ]
 )
