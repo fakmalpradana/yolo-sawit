@@ -1,13 +1,23 @@
 from ultralytics import YOLO
+from roboflow import Roboflow
 
-# Load a model
-model = YOLO("yolo11x-seg.yaml")  # build a new model from YAML
-model = YOLO("yolo11x-seg.pt")  # load a pretrained model (recommended for training)
-model = YOLO("yolo11x-seg.yaml").load("yolo11x.pt")  # build from YAML and transfer weights
+import subprocess as sp
 
-# Train the model
-results = model.train(
-    data="coco8-seg.yaml", 
-    epochs=10000, 
-    imgsz=320,
+# Load dataset
+rf = Roboflow(api_key="MAmVfKJcQVrC1zBogRHo")
+project = rf.workspace("project-geoai").project("palm-area-detections")
+version = project.version(1)
+dataset = version.download("yolov11")
+
+# Run YOLO training
+sp.call(
+    [
+        "yolo", 
+        "task=segment",
+        "mode=train", 
+        "model=yolo11s-seg.pt",
+        "data={dataset.location}/data.yaml", 
+        "epochs=10", 
+        "imgsz=640"
+    ]
 )
